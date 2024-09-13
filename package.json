@@ -1,0 +1,19 @@
+{
+  "name": "masterapi",
+  "version": "1.0.0",
+  "description": "restApi , authApi",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "restApis"
+  ],
+  "author": "Usman Rao",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.5.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2"
+  }
+}
