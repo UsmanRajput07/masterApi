@@ -1,5 +1,11 @@
-console.log("welcome to server");
+import app from './src/app';
+import { config } from './src/config/config';
 
-const hello = () => {
-  console.log('hello world');
+const serverStart = () => {
+  const port = process.env.PORT;
+
+  app.listen(port, () => {
+    console.log(`Server started on port ${port}`);
+  });
 };
+serverStart();
