@@ -1,9 +1,9 @@
 import express, { NextFunction, Request, Response } from 'express';
-import createHttpError, { HttpError } from 'http-errors';
-import { config } from './config/config';
 import { globalErrorHandler } from './middlewears/globalErrorHandler';
+import UserRouter from './user/userRouter';
 
 const app = express();
+app.use(express.json());
 
 // routes
 app.get('/', (req: Request, res: Response, next: NextFunction) => {
@@ -11,6 +11,7 @@ app.get('/', (req: Request, res: Response, next: NextFunction) => {
   res.json({ message: 'hello world' });
 });
 
+app.use("/api/users", UserRouter)
 // global error handler
 app.use(globalErrorHandler);
 export default app;
