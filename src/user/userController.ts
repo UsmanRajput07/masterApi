@@ -15,7 +15,6 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 
 
-
     //  database check
     try {
         const user = await userModal.findOne({ email });
@@ -46,9 +45,46 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     //  jwt token generate
     const token = sign({ sub: newUser._id }, config.jwtSecret as string, { expiresIn: '7d' });
 
-    res.json({ message: 'User created successfully', accesToken: token });
+    res.status(201).json({ message: 'User created successfully', accesToken: token });
 };
 
+// loginUser 
+
+const loginUser = async (req: Request, res: Response, next: NextFunction) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return next(createHttpError(400, 'All fields are required'));
+    }
+    let user;
+    try {
+        user = await userModal.findOne({ email });
+        if (!user) {
+            return next(createHttpError(404, 'User not found'));
+        }
+    }
+    catch (err) {
+        return next(createHttpError(500, 'Error while checking user in database'));
+    }
+    try {
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return next(createHttpError(401, 'Invalid credentials'));
+        }
+    }
+    catch (err) {
+        return next(createHttpError(500, 'Error while comparing password in database'));
+    }
+    try {
+        const token = sign({ sub: user._id }, config.jwtSecret as string, { expiresIn: '7d' });
+        res.status(200).json({ message: 'Login successful', token });
+    }
+    catch (err) {
+        return next(createHttpError(500, 'Error while generating token'));
+    }
+}
+
 export {
-    createUser
+    createUser,
+    loginUser
 }
