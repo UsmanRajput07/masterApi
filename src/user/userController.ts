@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import userModal from "./userModal";
 import { sign } from "jsonwebtoken";
 import { config } from "../config/config";
-import { user } from "./userTypes";
+import { User } from "./userTypes";
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
     const { name, email, password } = req.body;
@@ -28,7 +28,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    let newUser: user
+    let newUser: User
     try {
         newUser = await userModal.create({
             name,
