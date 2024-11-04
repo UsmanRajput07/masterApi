@@ -5,6 +5,9 @@ const _config = {
   MongoDbUrl: process.env.MONGO_URL,
   env: process.env.NODE_ENV,
   jwtSecret: process.env.JWT_SECRET,
+  cloudinaryName: process.env.cloud_name,
+  cloudinaryApiKey: process.env.cloudinary_api_key,
+  cloudinaryApiSecret: process.env.clouldnary_api_secret
 };
 
 export const config = Object.freeze(_config);
