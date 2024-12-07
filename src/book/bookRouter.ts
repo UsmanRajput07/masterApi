@@ -2,6 +2,7 @@ import path from "node:path"
 import multer from "multer";
 import express from 'express';
 import { createBook } from './bookControler';
+import authenticate from '../middlewears/authenticate';
 
 const bookRouter = express.Router();
 
@@ -17,20 +18,28 @@ const bookRouter = express.Router();
 // })
 
 const upload = multer({
-    // storage: storage,
-    dest: path.resolve(__dirname, "../../public/uploads"),
-    limits: {
-        fileSize: 3e7
-    }
-})
+  // storage: storage,
+  dest: path.resolve(__dirname, '../../public/uploads'),
+  limits: {
+    fileSize: 3e7,
+  },
+});
 
 // routes
-bookRouter.post("/create", upload.fields([{
-    name: "coverImg",
-    maxCount: 1
-}, {
-    name: "file",
-    maxCount: 1
-}]), createBook);
+bookRouter.post(
+  '/create',
+  upload.fields([
+    {
+      name: 'coverImg',
+      maxCount: 1,
+    },
+    {
+      name: 'file',
+      maxCount: 1,
+    },
+  ]),
+  authenticate,
+  createBook,
+);
 
 export default bookRouter;

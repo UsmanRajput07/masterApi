@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import { globalErrorHandler } from './middlewears/globalErrorHandler';
 import UserRouter from './user/userRouter';
 import bookRouter from './book/bookRouter';
@@ -12,9 +12,8 @@ app.use(express.json());
 //   res.json({ message: 'hello world' });
 // });
 
-app.use("/api/users", UserRouter)
-app.use("/api/books", bookRouter)
-
+app.use('/api/users', UserRouter);
+app.use('/api/books', bookRouter);
 
 // global error handler
 app.use(globalErrorHandler);
