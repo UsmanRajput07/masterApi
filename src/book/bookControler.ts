@@ -147,4 +147,37 @@ const getSingleBook = async (
     return next(createHttpError(500, 'error while gating a book'));
   }
 };
-export { createBook, updateBook, listBooks, getSingleBook };
+
+const deleteBook = async (req: Request, res: Response, next: NextFunction) => {
+  const bookId = req.params.bookId;
+  try {
+    const book = await bookModal.findOne({ _id: bookId });
+    if (!book) {
+      return next(createHttpError(404, 'book not found'));
+    }
+    const _req = req as AuthRequest;
+    if (book.author.toString() !== _req.userId) {
+      return next(createHttpError(403, 'You do not have access this source'));
+    }
+    // coverImg fileName on cloudinary
+    const coverImgSplit = book.coverImg.split('/');
+    const deleteId =
+      coverImgSplit?.at(-2) + '/' + coverImgSplit?.at(-1)?.split('.')?.at(0);
+    // delete book from cloudinary
+    const pdfSplit = book.file.split('/');
+    const pdfId = pdfSplit?.at(-2) + '/' + pdfSplit?.at(-1);
+    try {
+      await cloudinary.uploader.destroy(deleteId);
+      await cloudinary.uploader.destroy(pdfId, {
+        resource_type: 'raw',
+      });
+    } catch (err) {
+      return next(createHttpError(500, 'error while deleting a book'));
+    }
+    await bookModal.findByIdAndDelete({ _id: bookId });
+    return res.json({ message: 'book deleted' });
+  } catch (err) {
+    return next(createHttpError(500, 'error while deleting a book'));
+  }
+};
+export { createBook, updateBook, listBooks, getSingleBook, deleteBook };
