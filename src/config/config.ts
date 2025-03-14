@@ -8,6 +8,7 @@ const _config = {
   cloudinaryName: process.env.cloudinaryName,
   cloudinaryApiKey: process.env.cloudinary_ApiKey,
   cloudinaryApiSecret: process.env.cloudinary_ApiSecret,
+  frotendDomain: process.env.fontendUrl,
 };
 
 export const config = Object.freeze(_config);

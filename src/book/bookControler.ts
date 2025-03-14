@@ -1,20 +1,23 @@
 import { NextFunction, Request, Response } from 'express';
 import cloudinary from '../config/cloudinary';
 import path from 'node:path';
-import fs from 'node:fs';
 import createHttpError from 'http-errors';
 import bookModal from './bookModal';
+import fs from 'node:fs';
 import { AuthRequest } from '../middlewears/authenticate';
 const createBook = async (req: Request, res: Response, next: NextFunction) => {
   const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-  const fileName = files.coverImg[0].filename;
-  const coverImg = files.coverImg[0].mimetype.split('/').at(-1);
-  const filepath = path.resolve(__dirname, '../../public/uploads', fileName);
+  if (!files?.coverImg || files.coverImg.length === 0) {
+    return next(createHttpError(500, 'Cover image is required'));
+  }
+  const fileName = files?.coverImg[0].filename;
+  const coverImg = files?.coverImg[0].mimetype.split('/').at(-1);
+  const filepath = path?.resolve(__dirname, '../../public/uploads', fileName);
 
   //  upload pdf
-  const bookFileName = files.file[0].filename;
-  const bookFile = files.file[0].mimetype.split('/').at(-1);
-  const bookFilepath = path.resolve(
+  const bookFileName = files?.file[0].filename;
+  const bookFile = files?.file[0].mimetype.split('/').at(-1);
+  const bookFilepath = path?.resolve(
     __dirname,
     '../../public/uploads',
     bookFileName,
@@ -39,6 +42,7 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
       title: req.body.title,
       author: _req.userId,
       genre: req.body.genre,
+      description: req.body.description,
       file: uploadPdf.secure_url,
       coverImg: uploadImg.secure_url,
     });
@@ -82,7 +86,7 @@ const updateBook = async (req: Request, res: Response, next: NextFunction) => {
         format: type,
       });
       coverImgUrl = coverImg?.secure_url;
-      await fs.promises.unlink(filePath);
+      // fs.unlinkSync(filePath);
     }
     let pdfUrl = '';
     if (files.files) {
@@ -100,7 +104,7 @@ const updateBook = async (req: Request, res: Response, next: NextFunction) => {
         format: bookFile,
       });
       pdfUrl = uploadPdf?.secure_url;
-      await fs.promises.unlink(bookFilepath);
+      // fs.unlinkSync(bookFilepath);
     }
     const updatebook = await bookModal.findByIdAndUpdate(
       {
@@ -125,7 +129,7 @@ const updateBook = async (req: Request, res: Response, next: NextFunction) => {
 
 const listBooks = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const books = await bookModal.find();
+    const books = await bookModal.find().populate('author', 'name');
     res.json(books);
   } catch (err) {
     return next(createHttpError(500, 'error while getting a book'));
@@ -138,7 +142,9 @@ const getSingleBook = async (
 ) => {
   const bookId = req.params.bookId;
   try {
-    const book = await bookModal.findOne({ _id: bookId });
+    const book = await bookModal
+      .findOne({ _id: bookId })
+      .populate('author', 'name');
     if (!book) {
       return next(createHttpError(404, 'book not found'));
     }

@@ -24,7 +24,6 @@ const bookRouter = express.Router();
 // })
 
 const upload = multer({
-  // storage: storage,
   dest: path.resolve(__dirname, '../../public/uploads'),
   limits: {
     fileSize: 3e7,
@@ -35,7 +34,7 @@ const upload = multer({
 bookRouter.post(
   '/create',
   authenticate,
-  upload.fields([
+  upload?.fields([
     {
       name: 'coverImg',
       maxCount: 1,
